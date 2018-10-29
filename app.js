@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser')
 
@@ -7,12 +9,20 @@ const factoryRoutes = require("./routes/factories");
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/views'));
 
 app.get('/', (req, res) => {
-  res.send('whatup from express')
+  res.sendFile('index.html')
 })
+
+io.on('connection', function (socket) {
+  console.log('a user connected');
+  socket.on('disconnect', function () {
+    console.log('user disconnected');
+  });
+});
 
 app.use('/api/factories/', factoryRoutes)
 
-app.listen(port, () => console.log('listening on', port))
-
+server.listen(port, () => console.log('listening on', port))

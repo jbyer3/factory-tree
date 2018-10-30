@@ -1,5 +1,5 @@
-const socket = io();
 
+const socket = io();
 // on page load, fetch the data from mongo
 window.onload = () => {
 fetch('/api/factories')
@@ -75,5 +75,10 @@ function createFactory(e){
   redirect: "manual"
   })
   .then(res => {return res.json()})
+  .then(res => {
+    socket.emit('chat message', res)
+    res;
+    return false;
+  })
   .catch(err => console.log(err));
 }

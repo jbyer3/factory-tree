@@ -24,6 +24,10 @@ io.on('connection', function (socket) {
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
   });
+  socket.on('deletron', function(msg){
+    console.log(msg)
+    io.emit('deletron', msg)
+  })
 });
 
 app.use('/api/factories/', factoryRoutes)

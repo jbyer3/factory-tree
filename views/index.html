@@ -7,17 +7,19 @@
     <h2>root</h2>
   </header>
   <section>
-    <form action="">
-      <input name="name" placeholder="name" type="text" id="name-input">
-      <input name="lower-bound" placeholder="lower-bound" type="text" id="lower-bound-input">
-      <input name="upper-bound" placeholder="upper-bound" type="text" id="upper-bound-input">
-      <input name="number-of-children" placeholder="number-of-children" type="text" id="number-of-children-input">
-      <button type="submit">send</button>
+    <form id="inputter">
+      <input name="name" placeholder="name" type="text" class="inputs" id="name-input">
+      <input name="lower_bound" placeholder="lower-bound" type="number" class="inputs" id="lower-bound-input">
+      <input name="upper_bound" placeholder="upper-bound" type="number" class="inputs" id="upper-bound-input">
+      <input name="num_children" placeholder="number-of-children" type="number" class="inputs" id="number-of-children-input">
+      <button type="submit" id="submitter">send</button>
     </form>
   </section>
-  <ul class="output">
+  <ul id="output">
 
   </ul>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="scripts/app.js"></script>
 </body>

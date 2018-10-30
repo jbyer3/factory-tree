@@ -2,6 +2,7 @@
 const socket = io();
 // on page load, fetch the data from mongo
 window.onload = () => {
+  console.log('LOADED')
 fetch('/api/factories')
     .then(res => {
       return res.json()
@@ -15,10 +16,6 @@ fetch('/api/factories')
   form.addEventListener('submit', (e) =>{
     e.preventDefault();
     createFactory(e)})
-
-  $('span').on('click', function(){
-    console.log('jquery click')
-  })
 }
 
 function addFactories(factories){
@@ -33,10 +30,12 @@ function addFactories(factories){
     li.innerHTML = name;
     const span = document.createElement("span");
     span.innerHTML = 'x'
+    span.className = 'hihi'
     li.appendChild(span)
     //append new <li> to #output
     const list = document.querySelector('#output')
     list.appendChild(li)
+    
     span.addEventListener('click', function(){
       this.parentNode.parentNode.removeChild(this.parentNode);
       console.log(this.parentElement, _id)
@@ -77,8 +76,32 @@ function createFactory(e){
   .then(res => {return res.json()})
   .then(res => {
     socket.emit('chat message', res)
-    res;
+    // console.log(res);
     return false;
+  })
+  .then(() => {
+    socket.on('chat message', (factory) => {
+      console.log("this factory is :!!", factory)
+      const {name, _id} = factory
+      const li = document.createElement("li");
+      li.innerHTML = `${name}<span class="hihi">x</span>`
+      // li.innerHTML = name
+      // const span = document.createElement("span");
+      // span.appendChild(document.createTextNode('x'))
+      // li.appendChild(span)
+      const list = document.querySelector('#output')
+      list.appendChild(li)
+      span.addEventListener('click', function () {
+        this.parentNode.parentNode.removeChild(this.parentNode);
+        // console.log(this.parentElement, _id)
+        fetch(`api/factories/${_id}`, {
+          method: "DELETE",
+        })
+          .then(factory => console.log(factory))
+          .catch(err => console.log(err))
+      })
+    })
   })
   .catch(err => console.log(err));
 }
+

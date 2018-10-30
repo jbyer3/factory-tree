@@ -43,7 +43,7 @@ exports.updateFactory = (req, res) => {
 }
 
 exports.deleteFactory = (req, res) => {
-  db.Factory.remove({ _id: req.params.factoryId })
+  db.Factory.deleteOne({ _id: req.params.factoryId })
     .then(() => res.send('deleted!'))
     .catch(err => res.send(err))
 } 

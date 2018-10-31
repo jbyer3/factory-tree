@@ -9,29 +9,40 @@ socket.on('chat message', (factory) => {
       const li = document.createElement("li");
       li.innerHTML = `${name} :
         ${lower_bound} - ${upper_bound} will have ${num_children} children`
-        // <span 
-        // class="hihi"
-        // onclick="smang(this)"
-        // >x</span>`
       const span = document.createElement('span');
       span.innerHTML = 'x';
       span.className = 'hihi';
+      span.id = _id
       li.appendChild(span)
       const list = document.querySelector('#output')
       list.appendChild(li)
       // console.log("still here with the ", factory);
 
 
-        span.addEventListener('click', function () {
-          this.parentNode.parentNode.removeChild(this.parentNode);
-          // console.log(this.parentElement, _id)
-          fetch(`api/factories/${_id}`, {
-            method: "DELETE",
-          })
-            .then(factory => console.log(factory))
-            .catch(err => console.log(err))
+        span.addEventListener('click', function() {
+          socket.emit("deletron", _id);
+        //   this.parentNode.parentNode.removeChild(this.parentNode);
+        //   console.log(this.parentElement, _id)
+        //   fetch(`api/factories/${_id}`, {
+        //     method: "DELETE",
+        //   })
+        //     .then(res => {
+        //       socket.emit('deletron', res.body)
+        //       console.log('chat message deletron',res.body);
+        //       return false;
+        //     })
+        //     .then(res => console.log(res))
+        //     .catch(err => console.log(err))
         })
-        
+    })
+
+    socket.on('deletron', (x) => {
+      // x.parentElement.parentNode.parentNode.innerHTML.removeChild(this.parentElement)
+      // console.log(x.parentNode.innerHTML)
+
+      const dock = document.getElementById(x)
+      // console.log(dock.parentElement)
+      dock.parentElement.parentElement.removeChild(dock.parentElement)
       
     })
 // on page load, fetch the data from mongo
@@ -64,21 +75,29 @@ function addFactories(factories){
     // li.innerHTML = name;
     li.innerHTML = `${name} :
         ${lower_bound} - ${upper_bound} will have ${num_children} children`
-    const span = document.createElement("span");
+    var span = document.createElement("span");
     span.innerHTML = 'x'
     span.className = 'hihi'
+    span.id = _id
     li.appendChild(span)
     //append new <li> to #output
     const list = document.querySelector('#output')
     list.appendChild(li)
     
     span.addEventListener('click', function(){
-      this.parentNode.parentNode.removeChild(this.parentNode);
-      console.log(this.parentElement, _id)
+      // this.parentNode.parentNode.removeChild(this.parentNode);
+      // const el = span.target.parentElement
+      // console.log(span.target.parentElement)
+      // socket.emit('deletron', _id)
       fetch(`api/factories/${_id}`, {
-        method: "DELETE",
+        method: "delete"
       })
-        .then(res => console.log(res))
+        // .then(res => res.json())
+        .then(() => {
+          socket.emit('deletron', _id)
+          // console.log("id is blahlbha",_id);
+          return false;
+        })
         .catch(err => console.log(err))
     })
   })
@@ -122,10 +141,4 @@ function createFactory(e){
     return false;
   })
   .catch(err => console.log(err));
-}
-
-function smang(x) {
-  x.parentNode.parentNode.removeChild(x.parentNode);
-  fetch(`api/factories/`, )
-  console.log(x)
 }

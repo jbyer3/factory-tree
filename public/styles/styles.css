@@ -1,7 +1,26 @@
+body {
+  width: 67%;
+  display: flex;
+  flex-direction: column;
+
+  margin: 0 auto;
+}
+
 h1 {
   color: purple;
 }
 
 .hihi {
-  float: right;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: flex-end;
+}
+
+.inputter-on {
+  display: block;
+}
+
+.inputter-off {
+  display: none;
 }

@@ -1,6 +1,18 @@
 
 const socket = io();
 
+//hide form button//
+const closeFormBtn = document.querySelector('#form-close')
+closeFormBtn.addEventListener('click', () => {
+  closeFormBtn.parentNode.className = 'inputter-off'
+})
+
+const openFormBtn = document.querySelector("#form-open");
+openFormBtn.addEventListener("click", () => {
+  // openFormBtn.parentNode.className = "inputter-on";
+  openFormBtn.nextElementSibling.className = 'inputter-on'
+});
+
 //factory argument is json from Factory post request below
 socket.on('chat message', (factory) => {
       // console.log("this factory is :!!", factory)
@@ -16,39 +28,20 @@ socket.on('chat message', (factory) => {
       li.appendChild(span)
       const list = document.querySelector('#output')
       list.appendChild(li)
-      // console.log("still here with the ", factory);
-
-
-        span.addEventListener('click', function() {
-          socket.emit("deletron", _id);
-        //   this.parentNode.parentNode.removeChild(this.parentNode);
-        //   console.log(this.parentElement, _id)
-        //   fetch(`api/factories/${_id}`, {
-        //     method: "DELETE",
-        //   })
-        //     .then(res => {
-        //       socket.emit('deletron', res.body)
-        //       console.log('chat message deletron',res.body);
-        //       return false;
-        //     })
-        //     .then(res => console.log(res))
-        //     .catch(err => console.log(err))
-        })
+      span.addEventListener('click', function() {
+        socket.emit("deletron", _id);
     })
-
-    socket.on('deletron', (x) => {
-      // x.parentElement.parentNode.parentNode.innerHTML.removeChild(this.parentElement)
-      // console.log(x.parentNode.innerHTML)
-
+  }
+)
+socket.on('deletron', (x) => {
       const dock = document.getElementById(x)
-      // console.log(dock.parentElement)
       dock.parentElement.parentElement.removeChild(dock.parentElement)
-      
     })
+    
 // on page load, fetch the data from mongo
 window.onload = () => {
   console.log('LOADED')
-fetch('/api/factories')
+  fetch('/api/factories')
     .then(res => {
       return res.json()
     })

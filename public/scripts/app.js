@@ -4,13 +4,22 @@ const socket = io();
 //hide form button//
 const closeFormBtn = document.querySelector('#form-close')
 closeFormBtn.addEventListener('click', () => {
-  closeFormBtn.parentNode.className = 'inputter-off'
+  const form = closeFormBtn.previousElementSibling.previousElementSibling;
+  form.className = 'inputter-off';
+  openFormBtn.className = 'inputter-on';
+  closeFormBtn.className = 'inputter-off';
 })
 
 const openFormBtn = document.querySelector("#form-open");
 openFormBtn.addEventListener("click", () => {
   // openFormBtn.parentNode.className = "inputter-on";
-  openFormBtn.nextElementSibling.className = 'inputter-on'
+  const form = openFormBtn.previousElementSibling;
+  form.className = 'inputter-on';
+  const inputs = form.children
+  Array.from(inputs).forEach(x => {x.value=''})
+  // console.log(form.childNodes)
+  openFormBtn.className = 'inputter-off';
+  closeFormBtn.className = 'inputter-on';
 });
 
 //factory argument is json from Factory post request below

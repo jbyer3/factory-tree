@@ -1,22 +1,27 @@
 <head>
   <link rel="stylesheet" href="styles/styles.css">
 </head>
+
 <body>
   <header>
     <h1>a page made by Jason</h1>
-    <h2>root</h2>
   </header>
   <section>
-    <button id='form-open'>add new factory</button>
+    <h2>root</h2>
     <form id="inputter" class="inputter-off">
-      <input name="name" placeholder="name" type="text" class="inputs" id="name-input">
-      <input name="lower_bound" placeholder="lower-bound" type="number" class="inputs" id="lower-bound-input">
-      <input name="upper_bound" placeholder="upper-bound" type="number" class="inputs" id="upper-bound-input">
-      <input name="num_children" placeholder="number-of-children" type="number" class="inputs" id="number-of-children-input">
+      <input name="name" placeholder="name" type="text" class="inputs" id="name-input" required>
+      <input name="lower_bound" placeholder="lower-bound" type="number" class="inputs" id="lower-bound-input" required>
+      <input name="upper_bound" placeholder="upper-bound" type="number" class="inputs" id="upper-bound-input" required>
+      <input name="num_children" placeholder="number-of-children" type="number" class="inputs" id="number-of-children-input"
+        min="1" max="15" required>
       <button type="submit" id="submitter">send</button>
-      <button id='form-close'>close form</button>
     </form>
+    <button id='form-open'>add new factory</button>
+    <button id='form-close' class='inputter-off'>close form</button>
+
+
   </section>
+
   <ul id="output">
 
   </ul>

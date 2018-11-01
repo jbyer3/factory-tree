@@ -17,10 +17,26 @@ h1 {
   justify-content: flex-end;
 }
 
+#form-open {
+  margin-bottom:12px;
+}
+
 .inputter-on {
-  display: block;
+  /* display: block; */
 }
 
 .inputter-off {
   display: none;
+}
+
+input {
+  width: 60px;
+}
+
+section{
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
 }

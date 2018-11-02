@@ -27,25 +27,89 @@ socket.on('chat message', (factory) => {
       // console.log("this factory is :!!", factory)
       //destructure factory for view creation
       const {name, _id, lower_bound, upper_bound, num_children} = factory
+      //create li for each factory
       const li = document.createElement("li");
+      //fill li with destructured info
       li.innerHTML = `${name} :
         ${lower_bound} - ${upper_bound} will have ${num_children} children`
+      //create edit button for each factory
+      edit = document.createElement('button');
+      edit.innerHTML = 'edit';
+      li.appendChild(edit);
+      edit.addEventListener('click', () => socket.emit('editron', factory));
+      //create emit children button for each factory
+      createChild = document.createElement('button');
+      createChild.innerHTML = 'create!';
+      // createChild.addEventListener('click', () => socket.emit('procreate', factory));
+      createChild.addEventListener('click', () => {
+        const numKids = num_children
+        const factory = document.getElementById(_id).parentElement
+        const list = document.createElement('ul')
+        factory.appendChild(list)
+        const kidsArr = [];
+        for (i = 0; i < numKids; i++) {
+          // const kid = document.createElement("li");
+          const min = Math.ceil(lower_bound);
+          const max = Math.floor(upper_bound)
+          const kid = Math.floor(Math.random() * (max - min)) + min;
+          kidsArr.push(kid)
+        }
+        console.log(kidsArr)
+      });
+
+
+      li.appendChild(createChild);
       const span = document.createElement('span');
       span.innerHTML = 'x';
       span.className = 'hihi';
-      span.id = _id
-      li.appendChild(span)
-      const list = document.querySelector('#output')
-      list.appendChild(li)
-      span.addEventListener('click', function() {
+      span.id = _id;
+      li.appendChild(span);
+      const list = document.querySelector('#output');
+      list.appendChild(li);
+      span.addEventListener('click', () => {
         socket.emit("deletron", _id);
-    })
+    });
+    
   }
 )
 socket.on('deletron', (x) => {
       const dock = document.getElementById(x)
       dock.parentElement.parentElement.removeChild(dock.parentElement)
     })
+
+socket.on('editron', (y) => {
+  console.log('frmo eidtor',y)
+});
+
+
+socket.on('procreate', (z) => {
+  console.log(z)
+  console.log
+  const numKids = z.num_children
+  const factory = document.getElementById(z._id).parentElement.lastChild
+  const nikes = document.getElementById(`jason${z._id}`)
+
+  fetch(`/api/factories/${z._id}`)
+    .then(res => {
+      return res.json()
+    })
+    .then(res => {
+      return res.children
+    })
+    .then(res => {
+      console.log(res)
+      // console.log(factory)
+      factory.innerHTML = '';
+      res.forEach(x => {
+        const kid = document.createElement('li');
+        kid.innerHTML = x;
+        // factory.innerHTML = `<li>${x}</li>`;
+        factory.appendChild(kid);
+        console.log(factory)
+      })
+    })
+});
+
     
 // on page load, fetch the data from mongo
 window.onload = () => {
@@ -69,14 +133,65 @@ function addFactories(factories){
   //add factories to
   factories.forEach(factory => {
     // destructure the factory
-    const {name, _id, lower_bound, upper_bound, num_children} = factory
+    const {name, _id, lower_bound, upper_bound, num_children, children} = factory
     //create <li>
     const li = document.createElement("li");
-    //fill <li>
-    // li.innerHTML = name + '<span>x</span>';
-    // li.innerHTML = name;
+
     li.innerHTML = `${name} :
         ${lower_bound} - ${upper_bound} will have ${num_children} children`
+
+    // add edit //////
+    edit = document.createElement('button');
+    edit.innerHTML = 'edit';
+    edit.addEventListener('click', () => socket.emit('editron', factory));
+    li.appendChild(edit);
+    /////////////////
+
+    // add create ////
+    createChild = document.createElement('button');
+    createChild.innerHTML = 'create!';
+    // createChild.addEventListener('click', () => socket.emit('procreate', factory));
+    
+    createChild.addEventListener('click', () => {
+      const numKids = num_children;
+      const factory = document.getElementById(_id).parentElement
+      const list = document.createElement('ul')
+      factory.appendChild(list)
+      list.id = `jason${_id}`;
+      // console.log(list.previousElementSibling.innerHTML)
+      list.parentNode.removeChild(list.previousElementSibling)
+      const kidsArr = new Array;
+      // console.log('LIST IS ', factory.lastChild)
+      factory.lastChild.innerHTML = '';
+      for(i = 0; i < numKids; i++){
+      // const kid = document.createElement("li");
+      const min = Math.ceil(lower_bound);
+      const max = Math.floor(upper_bound)
+      const kid = Math.floor(Math.random() * (max - min)) + min;
+      kidsArr.push(kid)
+    }
+    const fun = Array.from(kidsArr)
+    // console.log(list)
+    fetch(`api/factories/${_id}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify({
+        children: fun,
+      }),
+    })
+    .then(res => {return res.json()})
+    // .then(res => console.log(res))
+    .then(res => {
+      socket.emit('procreate', res);
+      fun.innerHTML = '';
+      // console.log(fun.innerHTML)
+    })
+    });
+    li.appendChild(createChild);
+    /////////////////
+
     var span = document.createElement("span");
     span.innerHTML = 'x'
     span.className = 'hihi'
@@ -87,10 +202,6 @@ function addFactories(factories){
     list.appendChild(li)
     
     span.addEventListener('click', function(){
-      // this.parentNode.parentNode.removeChild(this.parentNode);
-      // const el = span.target.parentElement
-      // console.log(span.target.parentElement)
-      // socket.emit('deletron', _id)
       fetch(`api/factories/${_id}`, {
         method: "delete"
       })
@@ -102,6 +213,15 @@ function addFactories(factories){
         })
         .catch(err => console.log(err))
     })
+
+    const listerino = document.createElement('ul');
+    children.forEach(x => {
+      const elerment = document.createElement('li');
+      elerment.innerHTML = x;
+      listerino.appendChild(elerment);
+    })
+    li.appendChild(listerino);
+
   })
 }
 

@@ -29,6 +29,14 @@ io.on('connection', function (socket) {
     console.log(data)
     io.emit('deletron', data)
   })
+  socket.on('procreate', function(data){
+    console.log('procreate',data)
+    io.emit('procreate', data)
+  })
+  socket.on('editron', function (data) {
+    console.log('editron: ',data)
+    io.emit('editron', data)
+  })
 });
 
 app.use('/api/factories/', factoryRoutes)

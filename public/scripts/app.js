@@ -26,48 +26,123 @@ openFormBtn.addEventListener("click", () => {
 socket.on('chat message', (factory) => {
       // console.log("this factory is :!!", factory)
       //destructure factory for view creation
-      const {name, _id, lower_bound, upper_bound, num_children} = factory
+      const {name, _id, lower_bound, upper_bound, num_children, children} = factory
       //create li for each factory
-      const li = document.createElement("li");
-      //fill li with destructured info
-      li.innerHTML = `${name} :
-        ${lower_bound} - ${upper_bound} will have ${num_children} children`
-      //create edit button for each factory
-      edit = document.createElement('button');
-      edit.innerHTML = 'edit';
-      li.appendChild(edit);
-      edit.addEventListener('click', () => socket.emit('editron', factory));
-      //create emit children button for each factory
-      createChild = document.createElement('button');
-      createChild.innerHTML = 'create!';
-      // createChild.addEventListener('click', () => socket.emit('procreate', factory));
-      createChild.addEventListener('click', () => {
-        const numKids = num_children
-        const factory = document.getElementById(_id).parentElement
-        const list = document.createElement('ul')
-        factory.appendChild(list)
-        const kidsArr = [];
-        for (i = 0; i < numKids; i++) {
-          // const kid = document.createElement("li");
-          const min = Math.ceil(lower_bound);
-          const max = Math.floor(upper_bound)
-          const kid = Math.floor(Math.random() * (max - min)) + min;
-          kidsArr.push(kid)
-        }
-        console.log(kidsArr)
-      });
+      // const li = document.createElement("li");
+      // //fill li with destructured info
+      // li.innerHTML = `${name} :
+      //   ${lower_bound} - ${upper_bound} will have ${num_children} children`
+      // //create edit button for each factory
+      // edit = document.createElement('button');
+      // edit.innerHTML = 'edit';
+      // li.appendChild(edit);
+      // edit.addEventListener('click', () => socket.emit('editron', factory));
+      // //create emit children button for each factory
+      // createChild = document.createElement('button');
+      // createChild.innerHTML = 'create!';
+      // // createChild.addEventListener('click', () => socket.emit('procreate', factory));
+      // createChild.addEventListener('click', () => {
+      //   const numKids = num_children
+      //   const factory = document.getElementById(_id).parentElement
+      //   console.log(factory)
+      //   // const list = document.createElement('ul')
+      //   // factory.appendChild(list)
+      //   const kidsArr = [];
+      //   for (i = 0; i < numKids; i++) {
+      //     // const kid = document.createElement("li");
+      //     const min = Math.ceil(lower_bound);
+      //     const max = Math.floor(upper_bound)
+      //     const kid = Math.floor(Math.random() * (max - min)) + min;
+      //     kidsArr.push(kid)
+      //   }
+      //   const fun = Array.from(kidsArr)
+      //   // const listerino = document.createElement('ul')
+      //   fetch(`api/factories/${_id}`, {
+      //     method: 'PUT',
+      //     headers: {
+      //       "Content-Type": "application/json; charset=utf-8",
+      //     },
+      //     body: JSON.stringify({
+      //       children:fun,
+      //     }),
+      //   })
+      //   .then(res => {return res.json()})
+      //   // .then(res => console.log(res))
+      //   .then(res => {
+      //     console.log('lookin at rezzy', res)
+      //     socket.emit('procreate', res);
+      //     fun.innerHTML = '';
+      //   })
+      // });
+  const li = document.createElement("li");
 
+  li.innerHTML = `${name} :
+        ${lower_bound} - ${upper_bound} will have ${num_children} children`
+
+  // add edit //////
+  edit = document.createElement('button');
+  edit.innerHTML = 'edit';
+  edit.addEventListener('click', () => socket.emit('editron', factory));
+  li.appendChild(edit);
+  /////////////////
+
+  // add create ////
+  createChild = document.createElement('button');
+  createChild.innerHTML = 'create!';
+  // createChild.addEventListener('click', () => socket.emit('procreate', factory));
+
+  createChild.addEventListener('click', () => {
+    const numKids = num_children;
+    const factory = document.getElementById(_id)
+    const list = document.createElement('ul')
+    factory.appendChild(list)
+    list.id = _id;
+    // console.log(list.previousElementSibling.innerHTML)
+    list.parentNode.removeChild(list.previousElementSibling)
+    const kidsArr = new Array;
+    // console.log('LIST IS ', factory.lastChild)
+    factory.lastChild.innerHTML = '';
+    for (i = 0; i < numKids; i++) {
+      // const kid = document.createElement("li");
+      const min = Math.ceil(lower_bound);
+      const max = Math.floor(upper_bound)
+      const kid = Math.floor(Math.random() * (max - min)) + min;
+      kidsArr.push(kid)
+    }
+    const fun = Array.from(kidsArr)
+    // console.log(list)
+    fetch(`api/factories/${_id}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify({
+        children: fun,
+      }),
+    })
+      .then(res => { return res.json() })
+      // .then(res => console.log(res))
+      .then(res => {
+        console.log('GOOD RES', res)
+        socket.emit('procreate', res);
+        fun.innerHTML = '';
+        // console.log(fun.innerHTML)
+      })
+  });
 
       li.appendChild(createChild);
       const span = document.createElement('span');
       span.innerHTML = 'x';
       span.className = 'hihi';
-      span.id = _id;
+      span.id = `delete{_id}`;
       li.appendChild(span);
+      const mawr = document.createElement('ul')
+      mawr.id = _id;
+      li.appendChild(mawr)
       const list = document.querySelector('#output');
       list.appendChild(li);
       span.addEventListener('click', () => {
-        socket.emit("deletron", _id);
+        socket.emit("deletron", `delete{_id}`);
     });
     
   }
@@ -97,15 +172,14 @@ socket.on('procreate', (z) => {
       return res.children
     })
     .then(res => {
-      console.log(res)
-      // console.log(factory)
+      console.log('please help', factory)
       factory.innerHTML = '';
       res.forEach(x => {
         const kid = document.createElement('li');
         kid.innerHTML = x;
-        // factory.innerHTML = `<li>${x}</li>`;
+        // kid.innerHTML = `<li>${x}</li>`;
         factory.appendChild(kid);
-        console.log(factory)
+        // console.log(factory)
       })
     })
 });
@@ -157,7 +231,7 @@ function addFactories(factories){
       const factory = document.getElementById(_id).parentElement
       const list = document.createElement('ul')
       factory.appendChild(list)
-      list.id = `jason${_id}`;
+      list.id = _id;
       // console.log(list.previousElementSibling.innerHTML)
       list.parentNode.removeChild(list.previousElementSibling)
       const kidsArr = new Array;
@@ -184,6 +258,7 @@ function addFactories(factories){
     .then(res => {return res.json()})
     // .then(res => console.log(res))
     .then(res => {
+      console.log('GOOD RES', res)
       socket.emit('procreate', res);
       fun.innerHTML = '';
       // console.log(fun.innerHTML)

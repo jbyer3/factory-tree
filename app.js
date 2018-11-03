@@ -37,6 +37,10 @@ io.on('connection', function (socket) {
     console.log('editron: ',data)
     io.emit('editron', data)
   })
+  socket.on('update', function(data){
+    console.log('update: ', data)
+    io.emit('update', data)
+  })
 });
 
 app.use('/api/factories/', factoryRoutes)

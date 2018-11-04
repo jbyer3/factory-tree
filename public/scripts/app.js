@@ -1,6 +1,194 @@
 
 const socket = io();
 
+// on page load, fetch the data from mongo
+window.onload = () => {
+  fetch('/api/factories')
+    .then(res => {
+      return res.json()
+    })
+    .then(addFactories)
+    .catch(err => {
+      console.log(err)
+    })
+
+  const form = document.querySelector("#inputter")
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    createFactory(e)
+  })
+}
+
+function addFactories(factories) {
+  //add factories to
+  factories.forEach(factory => {
+    // destructure the factory
+    const { name, _id, lower_bound, upper_bound, num_children, children } = factory
+    //create <li>
+    const li = document.createElement("li");
+
+    li.innerHTML = `${name} :
+        ${lower_bound} - ${upper_bound} will have ${num_children} children`
+
+    // add edit //////
+    edit = document.createElement('button');
+    edit.innerHTML = 'edit';
+    edit.type = 'button';
+    edit.addEventListener('click', () => socket.emit('editron', factory));
+    li.appendChild(edit);
+    /////////////////
+
+    // add create ////
+    createChild = document.createElement('button');
+    createChild.innerHTML = 'create!';
+    createChild.type = 'button';
+    createChild.id = "createbtn";
+
+    createChild.addEventListener('click', () => {
+      const numKids = num_children;
+      const factory = document.getElementById(_id).parentElement
+      const list = document.createElement('ul')
+      factory.appendChild(list)
+      list.id = _id;
+      list.parentNode.removeChild(list.previousElementSibling)
+      const kidsArr = new Array;
+      factory.lastChild.innerHTML = '';
+      for (i = 0; i < numKids; i++) {
+        const min = Math.ceil(lower_bound);
+        const max = Math.floor(upper_bound)
+        const kid = Math.floor(Math.random() * (max - min)) + min;
+        kidsArr.push(kid)
+      }
+      const fun = Array.from(kidsArr)
+      fetch(`api/factories/${_id}`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify({
+          children: fun,
+        }),
+      })
+        .then(res => { return res.json() })
+        .then(res => {
+          socket.emit('procreate', res);
+          fun.innerHTML = '';
+        })
+        .catch(err => console.log(err))
+    });
+    li.appendChild(createChild);
+    /////////////////
+
+    var span = document.createElement("span");
+    span.innerHTML = 'delete factory'
+    span.className = 'hihi'
+    span.id = _id
+    li.appendChild(span)
+    //append new <li> to #output
+    const list = document.querySelector('#output')
+    list.appendChild(li)
+
+    span.addEventListener('click', function () {
+      fetch(`api/factories/${_id}`, {
+        method: "delete"
+      })
+        .then(res => { return res })
+        .then(() => {
+          socket.emit('deletron', _id)
+          return false;
+        })
+        .then(res => { return res })
+        .catch(err => console.log(err))
+    })
+
+    const listerino = document.createElement('ul');
+    children.forEach(x => {
+      const elerment = document.createElement('li');
+      elerment.innerHTML = x;
+      listerino.appendChild(elerment);
+    })
+    li.appendChild(listerino);
+
+  })
+}
+
+function createFactory(e) {
+  //create object to pass to post request
+  let payload = {};
+  //loop over inputs
+  [...e.target.children].forEach(child => {
+    //if child doesn't have a name.... continue....
+    if (child.getAttribute('name') === null) {
+      return;
+    }
+    // fill payload object with information from valid inputs
+    let key = child.getAttribute('name');
+    payload[key] = { value: child.value, type: child.getAttribute('type') };
+  });
+  fetch("api/factories", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    body: JSON.stringify({
+      name: `${payload.name.value}`,
+      lower_bound: `${payload.lower_bound.value}`,
+      upper_bound: `${payload.upper_bound.value}`,
+      num_children: `${payload.num_children.value}`,
+    }),
+    redirect: "manual"
+  })
+    .then(res => { return res.json() })
+    .catch(err => console.log(err))
+    //pass json to Chat Message socket function thing
+    .then(res => {
+      socket.emit('chat message', res)
+      return false;
+    })
+    .then(() => {
+      e.target.className = 'inputter-off';
+      const offButton = document.getElementById('form-close')
+      const onButton = document.getElementById('form-open')
+      offButton.className = 'inputter-off';
+      onButton.className = 'inputter-on'
+    })
+    .then(res => { return res })
+    .catch(err => console.log(err));
+}
+
+function editFactory(e) {
+  const id = e.target.parentElement.childNodes[3].id
+  let payload = {};
+  //loop over inputs
+  [...e.target.children].forEach(child => {
+    //if child doesn't have a name.... continue....
+    if (child.getAttribute("placeholder") === null) {
+      return;
+    }
+    // fill payload object with information from valid inputs
+    let key = child.getAttribute("placeholder");
+    payload[key] = { value: child.value, type: child.getAttribute("type") };
+  });
+  fetch(`api/factories/${id}`, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    body: JSON.stringify({
+      name: payload.name.value,
+      lower_bound: payload.lowerbound.value,
+      upper_bound: payload.upperbound.value,
+      num_children: payload.numberofchildren.value,
+    })
+  })
+    .then(res => { return res.json() })
+    .then(res => {
+      socket.emit('update', res)
+    })
+    .catch(err => console.log(err))
+}
+
 //hide form button//
 const closeFormBtn = document.querySelector('#form-close')
 closeFormBtn.addEventListener('click', () => {
@@ -266,193 +454,4 @@ socket.on('update', factory => {
         socket.emit("deletron", _id);
     });
   ////////////////////CHAT MESSAGE COPY////////////////////////
-
 })
-
-    
-// on page load, fetch the data from mongo
-window.onload = () => {
-  fetch('/api/factories')
-    .then(res => {
-      return res.json()
-    })
-    .then(addFactories)
-    .catch(err => {
-      console.log(err)
-    })
-
-  const form = document.querySelector("#inputter")
-  form.addEventListener('submit', e =>{
-    e.preventDefault();
-    createFactory(e)})
-}
-
-function addFactories(factories){
-  //add factories to
-  factories.forEach(factory => {
-    // destructure the factory
-    const {name, _id, lower_bound, upper_bound, num_children, children} = factory
-    //create <li>
-    const li = document.createElement("li");
-
-    li.innerHTML = `${name} :
-        ${lower_bound} - ${upper_bound} will have ${num_children} children`
-
-    // add edit //////
-    edit = document.createElement('button');
-    edit.innerHTML = 'edit';
-    edit.type = 'button';
-    edit.addEventListener('click', () => socket.emit('editron', factory));
-    li.appendChild(edit);
-    /////////////////
-
-    // add create ////
-    createChild = document.createElement('button');
-    createChild.innerHTML = 'create!';
-    createChild.type = 'button';
-    createChild.id = "createbtn";
-
-    createChild.addEventListener('click', () => {
-      const numKids = num_children;
-      const factory = document.getElementById(_id).parentElement
-      const list = document.createElement('ul')
-      factory.appendChild(list)
-      list.id = _id;
-      list.parentNode.removeChild(list.previousElementSibling)
-      const kidsArr = new Array;
-      factory.lastChild.innerHTML = '';
-      for(i = 0; i < numKids; i++){
-      const min = Math.ceil(lower_bound);
-      const max = Math.floor(upper_bound)
-      const kid = Math.floor(Math.random() * (max - min)) + min;
-      kidsArr.push(kid)
-    }
-    const fun = Array.from(kidsArr)
-    fetch(`api/factories/${_id}`, {
-      method: 'PUT',
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: JSON.stringify({
-        children: fun,
-      }),
-    })
-    .then(res => {return res.json()})
-    .then(res => {
-      socket.emit('procreate', res);
-      fun.innerHTML = '';
-    })
-    .catch(err => console.log(err))
-    });
-    li.appendChild(createChild);
-    /////////////////
-
-    var span = document.createElement("span");
-    span.innerHTML = 'delete factory'
-    span.className = 'hihi'
-    span.id = _id
-    li.appendChild(span)
-    //append new <li> to #output
-    const list = document.querySelector('#output')
-    list.appendChild(li)
-    
-    span.addEventListener('click', function(){
-      fetch(`api/factories/${_id}`, {
-        method: "delete"
-      })
-        .then(res => {return res})
-        .then(() => {
-          socket.emit('deletron', _id)
-          return false;
-        })
-        .then(res => {return res})
-        .catch(err => console.log(err))
-    })
-
-    const listerino = document.createElement('ul');
-    children.forEach(x => {
-      const elerment = document.createElement('li');
-      elerment.innerHTML = x;
-      listerino.appendChild(elerment);
-    })
-    li.appendChild(listerino);
-
-  })
-}
-
-function createFactory(e){
-  //create object to pass to post request
-  let payload = {};
-  //loop over inputs
-  [...e.target.children].forEach(child => {
-    //if child doesn't have a name.... continue....
-    if (child.getAttribute('name') === null) {
-      return;
-    }
-    // fill payload object with information from valid inputs
-    let key = child.getAttribute('name');
-    payload[key] = { value: child.value, type: child.getAttribute('type') };
-  });
-  fetch("api/factories", {
-  method: "POST",
-  mode: "cors",
-  headers: {
-    "Content-Type": "application/json; charset=utf-8",
-  },
-  body: JSON.stringify({
-    name: `${payload.name.value}`,
-    lower_bound: `${payload.lower_bound.value}`,
-    upper_bound: `${payload.upper_bound.value}`,
-    num_children: `${payload.num_children.value}`,
-  }),
-  redirect: "manual"
-  })
-  .then(res => {return res.json()})
-  .catch(err => console.log(err))
-  //pass json to Chat Message socket function thing
-  .then(res => {
-    socket.emit('chat message', res)
-    return false;
-  })
-  .then(() => {
-    e.target.className = 'inputter-off';
-    const offButton = document.getElementById('form-close')
-    const onButton = document.getElementById('form-open')
-    offButton.className = 'inputter-off';
-    onButton.className = 'inputter-on'
-  })
-  .then(res => {return res})
-  .catch(err => console.log(err));
-}
-
-function editFactory(e){
-  const id = e.target.parentElement.childNodes[3].id
-  let payload = {};
-  //loop over inputs
-  [...e.target.children].forEach(child => {
-    //if child doesn't have a name.... continue....
-    if (child.getAttribute("placeholder") === null) {
-      return;
-    }
-    // fill payload object with information from valid inputs
-    let key = child.getAttribute("placeholder");
-    payload[key] = { value: child.value, type: child.getAttribute("type") };
-  });
-  fetch(`api/factories/${id}`,{
-    method: 'PUT',
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-    },
-    body: JSON.stringify({
-      name: payload.name.value,
-      lower_bound: payload.lowerbound.value,
-      upper_bound: payload.upperbound.value,
-      num_children: payload.numberofchildren.value, 
-    })
-  })
-  .then(res => {return res.json()})
-  .then(res => {
-    socket.emit('update', res)
-  })
-  .catch(err => console.log(err))
-}

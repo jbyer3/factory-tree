@@ -42,6 +42,7 @@ socket.on('chat message', (factory) => {
   createChild = document.createElement('button');
   createChild.type = 'button';
   createChild.innerHTML = 'create!';
+  createChild.id = 'createbtn';
 
   createChild.addEventListener('click', () => {
     const numKids = num_children;
@@ -76,7 +77,7 @@ socket.on('chat message', (factory) => {
 
       li.appendChild(createChild);
       const span = document.createElement('span');
-      span.innerHTML = 'x';
+      span.innerHTML = 'delete factory';
       span.className = 'hihi';
       span.id = _id;
       li.appendChild(span);
@@ -101,7 +102,7 @@ socket.on('editron', (y) => {
       return res.json()
     })
     .then(res => { 
-      const FUCKSPAN = document.getElementById(y._id).parentElement
+      const spanner = document.getElementById(y._id).parentElement
       const form = document.createElement('form');
       form.name = 'edit-form'
       //edit name input
@@ -114,6 +115,7 @@ socket.on('editron', (y) => {
         </input>`;
       name.placeholder = 'name'
       name.required = true;
+      name.autofocus = true;
       form.appendChild(name);
       //edit lower_bound input
       const lower_bound = document.createElement('input');
@@ -157,11 +159,11 @@ socket.on('editron', (y) => {
       submitter.innerText = 'submitter'
       form.appendChild(submitter)
       
-      if(FUCKSPAN.childElementCount === 4){
-        FUCKSPAN.insertBefore(form, FUCKSPAN.lastChild)
+      if(spanner.childElementCount === 4){
+        spanner.insertBefore(form, spanner.lastChild)
         edit.innerHTML = 'close';
       } else {
-        FUCKSPAN.removeChild(FUCKSPAN.lastChild.previousSibling)
+        spanner.removeChild(spanner.lastChild.previousSibling)
         edit.innerHTML = 'edit';
       }
 
@@ -175,10 +177,8 @@ socket.on('editron', (y) => {
 
 
 socket.on('procreate', (z) => {
-  const numKids = z.num_children
   const factory = document.getElementById(z._id).parentElement.lastChild
   console.log(factory)
-  const nikes = document.getElementById(`jason${z._id}`)
 
   fetch(`/api/factories/${z._id}`)
     .then(res => {
@@ -206,7 +206,7 @@ socket.on('update', factory => {
 
 
   ////////////////////CHAT MESSAGE COPY////////////////////////
-  const {name, _id, lower_bound, upper_bound, num_children, children} = factory
+  const {name, _id, lower_bound, upper_bound, num_children} = factory
 
   const li = document.createElement("li");
 
@@ -225,6 +225,7 @@ socket.on('update', factory => {
   createChild = document.createElement('button');
   createChild.type = 'button';
   createChild.innerHTML = 'create!';
+  createChild.id = 'createbtn';
 
   createChild.addEventListener('click', () => {
     const numKids = num_children;
@@ -258,7 +259,7 @@ socket.on('update', factory => {
 
       li.appendChild(createChild);
       const span = document.createElement('span');
-      span.innerHTML = 'x';
+      span.innerHTML = 'delete factory';
       span.className = 'hihi';
       span.id = _id;
       li.appendChild(span);
@@ -317,7 +318,8 @@ function addFactories(factories){
     createChild = document.createElement('button');
     createChild.innerHTML = 'create!';
     createChild.type = 'button';
-    
+    createChild.id = "createbtn";
+
     createChild.addEventListener('click', () => {
       const numKids = num_children;
       const factory = document.getElementById(_id).parentElement
@@ -327,10 +329,8 @@ function addFactories(factories){
       console.log(list.previousElementSibling.innerHTML)
       list.parentNode.removeChild(list.previousElementSibling)
       const kidsArr = new Array;
-      // console.log('LIST IS ', factory.lastChild)
       factory.lastChild.innerHTML = '';
       for(i = 0; i < numKids; i++){
-      // const kid = document.createElement("li");
       const min = Math.ceil(lower_bound);
       const max = Math.floor(upper_bound)
       const kid = Math.floor(Math.random() * (max - min)) + min;
@@ -358,7 +358,7 @@ function addFactories(factories){
     /////////////////
 
     var span = document.createElement("span");
-    span.innerHTML = 'x'
+    span.innerHTML = 'delete factory'
     span.className = 'hihi'
     span.id = _id
     li.appendChild(span)
@@ -370,7 +370,7 @@ function addFactories(factories){
       fetch(`api/factories/${_id}`, {
         method: "delete"
       })
-        // .then(res => res.json())
+        .then(res => {return res})
         .then(() => {
           socket.emit('deletron', _id)
           return false;
@@ -415,7 +415,6 @@ function createFactory(e){
     upper_bound: `${payload.upper_bound.value}`,
     num_children: `${payload.num_children.value}`,
   }),
-  //not sure what this does...
   redirect: "manual"
   })
   .then(res => {return res.json()})
@@ -429,10 +428,10 @@ function createFactory(e){
   .then(console.log(e.target.childNodes[9]))
   .then(() => {
     e.target.className = 'inputter-off';
-    console.log(e.target.nextElementSibling)
-    e.target.nextElementSibling.className='inputter-off'
-    e.target.nextSibling.nextSibling.className='inputter-on'
-    e.target.nextSibling.nextSibling.nextElementSibling.className='inputter-off'
+    const offButton = document.getElementById('form-close')
+    const onButton = document.getElementById('form-open')
+    offButton.className = 'inputter-off';
+    onButton.className = 'inputter-on'
   })
   .then(res => {return res})
   .catch(err => console.log(err));
@@ -441,7 +440,6 @@ function createFactory(e){
 function editFactory(e){
   console.log('e is: ', e.target.parentElement.childNodes[3].id);
   const id = e.target.parentElement.childNodes[3].id
-  const wha = e.target.children;
   console.log();
   let payload = {};
   //loop over inputs

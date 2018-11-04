@@ -137,7 +137,8 @@ socket.on('editron', (y) => {
       value="${y.lower_bound}">
       ${y.lower_bound}
       </input>`;
-      lower_bound.placeholder = 'lowerbound'
+      lower_bound.placeholder = 'lowerbound';
+      lower_bound.type = 'number';
       lower_bound.required = true;
       form.appendChild(lower_bound);
       //edit upper_bound input
@@ -148,18 +149,21 @@ socket.on('editron', (y) => {
         value="${y.upper_bound}">
         ${y.upper_bound}</input>`;
       upper_bound.placeholder = 'upperbound';
+      upper_bound.type = 'number';
       upper_bound.required = true;
       form.appendChild(upper_bound);
       //edit num_children input
       const num_children = document.createElement('input');
       num_children.innerHTML = `<label>${y.num_children}</label>
-        <input type="number" 
-        name="num_children"
-        value="${y.num_children}">
+        <input type="number"
+        id="numbchildrenz"
+        name="num_children">
         ${y.num_children}
         </input>`;
       num_children.placeholder = 'numberofchildren';
+      num_children.type = 'number';
       num_children.required = true;
+      num_children.max = '15';
       form.appendChild(num_children);
       //submit button 
       const submitter = document.createElement('button');
@@ -175,13 +179,15 @@ socket.on('editron', (y) => {
         FUCKSPAN.removeChild(FUCKSPAN.lastChild.previousSibling)
         edit.innerHTML = 'edit';
       }
-      
+
       form.addEventListener('submit', e => {
           // console.log(e.target.children)
           e.preventDefault();
-          if(e.target.children[3] >= 0 && e.target.children[3] <= 15){
+          // if(e.target.children[4].value >= 0 && e.target.children[4].value <= 15){
             editFactory(e)
-          }
+          // } else {
+          //   alert('make the children between 1 and 15')
+          // }
         })
     })
     .catch(err => console.log(err))

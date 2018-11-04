@@ -23,9 +23,3 @@ var factorySchema = new mongoose.Schema({
 const Factory = mongoose.model('Factory', factorySchema)
 
 module.exports = Factory
-
-// name
-// lower bound
-// upper bound
-// number of children to create
-// children belonging to this factory

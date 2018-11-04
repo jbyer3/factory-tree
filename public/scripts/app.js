@@ -46,24 +46,16 @@ socket.on('chat message', (factory) => {
   createChild.addEventListener('click', () => {
     const numKids = num_children;
     const factory = document.getElementById(_id)
-    // const list = document.createElement('ul')
     console.log(factory)
-    // factory.appendChild(list)
-    // list.id = _id;
-    // console.log(list)
-    // list.parentNode.removeChild(list.previousElementSibling)
     const kidsArr = new Array;
-    // console.log('LIST IS ', factory.lastChild)
     factory.lastChild.innerHTML = '';
     for (i = 0; i < numKids; i++) {
-      // const kid = document.createElement("li");
       const min = Math.ceil(lower_bound);
       const max = Math.floor(upper_bound)
       const kid = Math.floor(Math.random() * (max - min)) + min;
       kidsArr.push(kid)
     }
     const fun = Array.from(kidsArr)
-    // console.log(list)
     fetch(`api/factories/${_id}`, {
       method: 'PUT',
       headers: {
@@ -74,12 +66,10 @@ socket.on('chat message', (factory) => {
       }),
     })
       .then(res => { return res.json() })
-      // .then(res => console.log(res))
       .then(res => {
         console.log('GOOD RES', res)
         socket.emit('procreate', res);
         fun.innerHTML = '';
-        // console.log(fun.innerHTML)
       })
       .catch(err => console.log(err))
   });
@@ -91,7 +81,6 @@ socket.on('chat message', (factory) => {
       span.id = _id;
       li.appendChild(span);
       const mawr = document.createElement('ul')
-      // mawr.id = _id;
       li.appendChild(mawr)
       const list = document.querySelector('#output');
       list.appendChild(li);
@@ -112,10 +101,7 @@ socket.on('editron', (y) => {
       return res.json()
     })
     .then(res => { 
-      // const pooper = document.createElement('h1');
-      // pooper.innerHTML = 'FUCK YES!'
       const FUCKSPAN = document.getElementById(y._id).parentElement
-      // FUCKSPAN.appendChild(pooper);
       const form = document.createElement('form');
       form.name = 'edit-form'
       //edit name input
@@ -172,7 +158,6 @@ socket.on('editron', (y) => {
       form.appendChild(submitter)
       
       if(FUCKSPAN.childElementCount === 4){
-        // FUCKSPAN.appendChild(form)
         FUCKSPAN.insertBefore(form, FUCKSPAN.lastChild)
         edit.innerHTML = 'close';
       } else {
@@ -181,13 +166,8 @@ socket.on('editron', (y) => {
       }
 
       form.addEventListener('submit', e => {
-          // console.log(e.target.children)
           e.preventDefault();
-          // if(e.target.children[4].value >= 0 && e.target.children[4].value <= 15){
             editFactory(e)
-          // } else {
-          //   alert('make the children between 1 and 15')
-          // }
         })
     })
     .catch(err => console.log(err))
@@ -195,7 +175,6 @@ socket.on('editron', (y) => {
 
 
 socket.on('procreate', (z) => {
-  // console.log(z)
   const numKids = z.num_children
   const factory = document.getElementById(z._id).parentElement.lastChild
   console.log(factory)
@@ -209,27 +188,22 @@ socket.on('procreate', (z) => {
       return res.children
     })
     .then(res => {
-      // console.log('please help', factory)
       factory.innerHTML = '';
       res.forEach(x => {
         const kid = document.createElement('li');
         kid.innerHTML = x;
-        // kid.innerHTML = `<li>${x}</li>`;
         factory.appendChild(kid);
-        // console.log(factory)
       })
     })
+    .catch(err => console.log(err))
 });
 
 socket.on('update', factory => {
-  // console.log('update socket says: ', factory)
   const editForm = document.getElementById(factory._id).nextElementSibling.nextElementSibling;
-  // console.log(editForm)
 
   const oldSpot = editForm.parentElement;
   console.log("old spot should be",oldSpot.innerHTML)
 
-  // editForm.parentElement.innerHTML = 
 
   ////////////////////CHAT MESSAGE COPY////////////////////////
   const {name, _id, lower_bound, upper_bound, num_children, children} = factory
@@ -255,23 +229,15 @@ socket.on('update', factory => {
   createChild.addEventListener('click', () => {
     const numKids = num_children;
     const factory = document.getElementById(_id)
-    // const list = document.createElement('ul')
-    // factory.appendChild(list)
-    // list.id = _id;
-    // console.log(list.previousElementSibling.innerHTML)
-    // list.parentNode.removeChild(list.previousElementSibling)
     const kidsArr = new Array;
-    // console.log('LIST IS ', factory.lastChild)
     factory.lastChild.innerHTML = '';
     for (i = 0; i < numKids; i++) {
-      // const kid = document.createElement("li");
       const min = Math.ceil(lower_bound);
       const max = Math.floor(upper_bound)
       const kid = Math.floor(Math.random() * (max - min)) + min;
       kidsArr.push(kid)
     }
     const fun = Array.from(kidsArr)
-    // console.log(list)
     fetch(`api/factories/${_id}`, {
       method: 'PUT',
       headers: {
@@ -282,12 +248,10 @@ socket.on('update', factory => {
       }),
     })
       .then(res => { return res.json() })
-      // .then(res => console.log(res))
       .then(res => {
         console.log('GOOD RES', res)
         socket.emit('procreate', res);
         fun.innerHTML = '';
-        // console.log(fun.innerHTML)
       })
       .catch(err => console.log(err))
   });
@@ -299,10 +263,8 @@ socket.on('update', factory => {
       span.id = _id;
       li.appendChild(span);
       const mawr = document.createElement('ul')
-      // mawr.id = _id;
       li.appendChild(mawr)
       const list = document.querySelector('#output');
-      // list.appendChild(li);
       list.insertBefore(li, oldSpot.nextElementSibling);
       oldSpot.parentElement.removeChild(oldSpot)
 
@@ -355,7 +317,6 @@ function addFactories(factories){
     createChild = document.createElement('button');
     createChild.innerHTML = 'create!';
     createChild.type = 'button';
-    // createChild.addEventListener('click', () => socket.emit('procreate', factory));
     
     createChild.addEventListener('click', () => {
       const numKids = num_children;
@@ -376,7 +337,6 @@ function addFactories(factories){
       kidsArr.push(kid)
     }
     const fun = Array.from(kidsArr)
-    // console.log(list)
     fetch(`api/factories/${_id}`, {
       method: 'PUT',
       headers: {
@@ -387,13 +347,12 @@ function addFactories(factories){
       }),
     })
     .then(res => {return res.json()})
-    // .then(res => console.log(res))
     .then(res => {
       console.log('GOOD RES', res)
       socket.emit('procreate', res);
       fun.innerHTML = '';
-      // console.log(fun.innerHTML)
     })
+    .catch(err => console.log(err))
     });
     li.appendChild(createChild);
     /////////////////
@@ -414,7 +373,6 @@ function addFactories(factories){
         // .then(res => res.json())
         .then(() => {
           socket.emit('deletron', _id)
-          // console.log("id is blahlbha",_id);
           return false;
         })
         .then(res => {return res})
@@ -445,7 +403,6 @@ function createFactory(e){
     let key = child.getAttribute('name');
     payload[key] = { value: child.value, type: child.getAttribute('type') };
   });
-  // console.log("payload is: ", payload);
   fetch("api/factories", {
   method: "POST",
   mode: "cors",
@@ -466,7 +423,6 @@ function createFactory(e){
   //pass json to Chat Message socket function thing
   .then(res => {
     socket.emit('chat message', res)
-    // console.log(res);
     return false;
   })
   .then((console.log(e.target)))
@@ -511,11 +467,6 @@ function editFactory(e){
       num_children: payload.numberofchildren.value, 
     })
   })
-  // .then(() => {
-  //   console.log(e.target.parentNode.innerHTML)
-  //   e.target.parentElement.innerHTML = payload.name.value
-  //   console.log()
-  // })
   .then(res => {return res.json()})
   .then(res => {
     socket.emit('update', res)

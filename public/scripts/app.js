@@ -123,45 +123,43 @@ socket.on('editron', (y) => {
       name.innerHTML = `<label>${y.name}</label>
         <input type="text"
         name="name"
-        required
         value="${y.name}">
         ${y.name}
         </input>`;
       name.placeholder = 'name'
+      name.required = true;
       form.appendChild(name);
       //edit lower_bound input
       const lower_bound = document.createElement('input');
       lower_bound.innerHTML = `<label>${y.lower_bound}</label>
       <input type="number"
-      name="lower_bound"
-      required
+      name="lower_bound
       value="${y.lower_bound}">
       ${y.lower_bound}
       </input>`;
       lower_bound.placeholder = 'lowerbound'
+      lower_bound.required = true;
       form.appendChild(lower_bound);
       //edit upper_bound input
       const upper_bound = document.createElement('input');
       upper_bound.innerHTML = `<label>${y.upper_bound}</label>
         <input type="number"
         name="upper_bound"
-        required
         value="${y.upper_bound}">
         ${y.upper_bound}</input>`;
-      upper_bound.placeholder = 'upperbound'
+      upper_bound.placeholder = 'upperbound';
+      upper_bound.required = true;
       form.appendChild(upper_bound);
       //edit num_children input
       const num_children = document.createElement('input');
       num_children.innerHTML = `<label>${y.num_children}</label>
         <input type="number" 
         name="num_children"
-        required
         value="${y.num_children}">
         ${y.num_children}
         </input>`;
       num_children.placeholder = 'numberofchildren';
-      num_children.max = 15;
-      num_children.min = 1;
+      num_children.required = true;
       form.appendChild(num_children);
       //submit button 
       const submitter = document.createElement('button');
@@ -179,8 +177,11 @@ socket.on('editron', (y) => {
       }
       
       form.addEventListener('submit', e => {
+          // console.log(e.target.children)
           e.preventDefault();
-          editFactory(e)
+          if(e.target.children[3] >= 0 && e.target.children[3] <= 15){
+            editFactory(e)
+          }
         })
     })
     .catch(err => console.log(err))

@@ -156,12 +156,12 @@ socket.on('editron', (y) => {
         <input type="number" 
         name="num_children"
         required
-        value="${y.num_children}" 
-        min="1" 
-        max="15">
+        value="${y.num_children}">
         ${y.num_children}
         </input>`;
-      num_children.placeholder = 'numberofchildren'
+      num_children.placeholder = 'numberofchildren';
+      num_children.max = 15;
+      num_children.min = 1;
       form.appendChild(num_children);
       //submit button 
       const submitter = document.createElement('button');

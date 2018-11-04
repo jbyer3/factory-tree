@@ -22,7 +22,6 @@ openFormBtn.addEventListener("click", () => {
 
 //factory argument is json from Factory post request below
 socket.on('chat message', (factory) => {
-  console.log(factory)
   const {name, _id, lower_bound, upper_bound, num_children, children} = factory
 
   const li = document.createElement("li");
@@ -47,7 +46,6 @@ socket.on('chat message', (factory) => {
   createChild.addEventListener('click', () => {
     const numKids = num_children;
     const factory = document.getElementById(_id)
-    console.log(factory)
     const kidsArr = new Array;
     factory.lastChild.innerHTML = '';
     for (i = 0; i < numKids; i++) {
@@ -68,7 +66,6 @@ socket.on('chat message', (factory) => {
     })
       .then(res => { return res.json() })
       .then(res => {
-        console.log('GOOD RES', res)
         socket.emit('procreate', res);
         fun.innerHTML = '';
       })
@@ -178,7 +175,6 @@ socket.on('editron', (y) => {
 
 socket.on('procreate', (z) => {
   const factory = document.getElementById(z._id).parentElement.lastChild
-  console.log(factory)
 
   fetch(`/api/factories/${z._id}`)
     .then(res => {
@@ -202,8 +198,6 @@ socket.on('update', factory => {
   const editForm = document.getElementById(factory._id).nextElementSibling.nextElementSibling;
 
   const oldSpot = editForm.parentElement;
-  console.log("old spot should be",oldSpot.innerHTML)
-
 
   ////////////////////CHAT MESSAGE COPY////////////////////////
   const {name, _id, lower_bound, upper_bound, num_children} = factory
@@ -250,7 +244,6 @@ socket.on('update', factory => {
     })
       .then(res => { return res.json() })
       .then(res => {
-        console.log('GOOD RES', res)
         socket.emit('procreate', res);
         fun.innerHTML = '';
       })
@@ -279,7 +272,6 @@ socket.on('update', factory => {
     
 // on page load, fetch the data from mongo
 window.onload = () => {
-  console.log('LOADED')
   fetch('/api/factories')
     .then(res => {
       return res.json()
@@ -326,7 +318,6 @@ function addFactories(factories){
       const list = document.createElement('ul')
       factory.appendChild(list)
       list.id = _id;
-      console.log(list.previousElementSibling.innerHTML)
       list.parentNode.removeChild(list.previousElementSibling)
       const kidsArr = new Array;
       factory.lastChild.innerHTML = '';
@@ -348,7 +339,6 @@ function addFactories(factories){
     })
     .then(res => {return res.json()})
     .then(res => {
-      console.log('GOOD RES', res)
       socket.emit('procreate', res);
       fun.innerHTML = '';
     })
@@ -424,8 +414,6 @@ function createFactory(e){
     socket.emit('chat message', res)
     return false;
   })
-  .then((console.log(e.target)))
-  .then(console.log(e.target.childNodes[9]))
   .then(() => {
     e.target.className = 'inputter-off';
     const offButton = document.getElementById('form-close')
@@ -438,9 +426,7 @@ function createFactory(e){
 }
 
 function editFactory(e){
-  console.log('e is: ', e.target.parentElement.childNodes[3].id);
   const id = e.target.parentElement.childNodes[3].id
-  console.log();
   let payload = {};
   //loop over inputs
   [...e.target.children].forEach(child => {
@@ -452,7 +438,6 @@ function editFactory(e){
     let key = child.getAttribute("placeholder");
     payload[key] = { value: child.value, type: child.getAttribute("type") };
   });
-  console.log('payload is: ', payload)
   fetch(`api/factories/${id}`,{
     method: 'PUT',
     headers: {
